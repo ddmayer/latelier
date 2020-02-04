@@ -65,12 +65,12 @@ export default {
     sending: false,
     valid: false,
     emailRules: [
-      (v) => !!v || "L'email est obligatoire",
-      (v) => (v && v.length > 1) || "L'email est invalide"
+      v => !!v || "L'email est obligatoire",
+      v => (v && v.length > 1) || "L'email est invalide"
     ],
     passwordRules: [
-      (v) => !!v || "Le mot de passe est obligatoire",
-      (v) => (v && v.length > 2) || "Le mot de passe est trop court"
+      v => !!v || "Le mot de passe est obligatoire",
+      v => (v && v.length > 2) || "Le mot de passe est trop court"
     ]
   }),
   methods: {
@@ -87,13 +87,26 @@ export default {
         password: this.form.password,
         email: this.form.email
       };
-      Meteor.call("users.create", userData, (error) => {
+      Meteor.call("users.create", userData, error => {
         this.sending = false;
         this.notify = false;
         if (error) {
           this.$notifyError(error);
-        } else {
+        } else if (Meteor.settings.public.email_verification_needed) {
           this.$router.push({ name: "registration-completed" });
+        } else {
+          Meteor.loginWithPassword(this.form.email, this.form.password, err => {
+            this.sending = false;
+            this.notify = false;
+            if (err) {
+              this.notifyText = `Erreur ${err.reason}`;
+              this.notify = true;
+            } else {
+              this.clearForm();
+              this.$notify(this.$t("Welcome to you!"));
+              this.$router.push({ name: "dashboard-page" });
+            }
+          });
         }
       });
     },

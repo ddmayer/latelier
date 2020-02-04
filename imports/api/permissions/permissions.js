@@ -117,7 +117,10 @@ if (Meteor.isServer) {
       return true;
     }
 
-    if (attemptObj.user.emails[0].verified === true) {
+    if (
+      !Meteor.settings.public.email_verification_needed ||
+      attemptObj.user.emails[0].verified === true
+    ) {
       return true;
     }
     throw new Meteor.Error(
@@ -133,33 +136,33 @@ export const checkLoggedIn = () => {
   }
 };
 
-export const checkAdmin = (scope) => {
+export const checkAdmin = scope => {
   if (!Permissions.isAdmin(Meteor.userId(), scope)) {
     throw new Meteor.Error("not-authorized");
   }
 };
 
-export const checkCanReadProject = (projectId) => {
+export const checkCanReadProject = projectId => {
   Meteor.call("permissions.canReadProject", { projectId });
 };
 
-export const checkCanWriteProject = (projectId) => {
+export const checkCanWriteProject = projectId => {
   Meteor.call("permissions.canWriteProject", { projectId });
 };
 
-export const checkCanDeleteProject = (projectId) => {
+export const checkCanDeleteProject = projectId => {
   Meteor.call("permissions.canDeleteProject", { projectId });
 };
 
-export const checkCanReadTask = (taskId) => {
+export const checkCanReadTask = taskId => {
   Meteor.call("permissions.canReadTask", { taskId });
 };
 
-export const checkCanWriteTask = (taskId) => {
+export const checkCanWriteTask = taskId => {
   Meteor.call("permissions.canWriteTask", { taskId });
 };
 
-export const checkCanDeleteTask = (taskId) => {
+export const checkCanDeleteTask = taskId => {
   Meteor.call("permissions.canDeleteTask", { taskId });
 };
 Permissions.methods = {};

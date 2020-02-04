@@ -31,7 +31,8 @@ import confirm from "/imports/confirm/confirm";
 if (Meteor.settings.public.devServerURL) {
   // HMR url for iOS
   /* eslint no-undef: "off" */
-  __meteor_runtime_config__.VUE_DEV_SERVER_URL = Meteor.settings.public.devServerURL;
+  __meteor_runtime_config__.VUE_DEV_SERVER_URL =
+    Meteor.settings.public.devServerURL;
 }
 
 Meteor.startup(() => {
@@ -43,13 +44,13 @@ Meteor.startup(() => {
 
 Accounts.config({
   forbidClientAccountCreation: true,
-  sendVerificationEmail: true
+  sendVerificationEmail: Meteor.settings.public.email_verification_needed
 });
 
 /* eslint no-underscore-dangle: "off" */
 delete Accounts._accountsCallbacks["verify-email"];
 Accounts.onEmailVerificationLink(function(token, done) {
-  Accounts.verifyEmail(token, (err) => {
+  Accounts.verifyEmail(token, err => {
     if (err) {
       /* eslint no-console:off */
       console.log("Error: ", err);
@@ -100,7 +101,7 @@ Meteor.startup(() => {
   UserPresence.start();
 
   Vue.directive("focus", {
-    inserted: (el) => {
+    inserted: el => {
       setTimeout(() => {
         el.focus();
       }, 500);
@@ -129,18 +130,18 @@ Meteor.startup(() => {
     router,
     store,
     vuetify,
-    render: (h) => h(App)
+    render: h => h(App)
   }).$mount("app");
 
-  Vue.prototype.$notifyError = function (error) {
+  Vue.prototype.$notifyError = function(error) {
     store.dispatch("notifyError", error);
   };
 
-  Vue.prototype.$notify = function (message) {
+  Vue.prototype.$notify = function(message) {
     store.dispatch("notify", message);
   };
 
-  Tracker.autorun((c) => {
+  Tracker.autorun(c => {
     const userId = Meteor.userId();
     if (c.firstRun) return;
     if (!userId) {

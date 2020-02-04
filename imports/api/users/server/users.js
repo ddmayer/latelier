@@ -90,7 +90,7 @@ Meteor.methods({
       })
       .fetch();
 
-    data.forEach((user) => {
+    data.forEach(user => {
       user.features = {
         emailVerified: user.emails[0].verified,
         isActive: Permissions.isActive(user),
@@ -257,7 +257,10 @@ Meteor.methods({
       throw new Meteor.Error("not-authorized");
     }
     const userId = Accounts.createUser(userData);
-    Accounts.sendVerificationEmail(userId);
+    if (Meteor.settings.public.email_verification_needed) {
+      return Accounts.sendVerificationEmail(userId);
+    }
+    return userId;
   },
 
   "users.getEmailPreferences"() {
@@ -300,9 +303,9 @@ Meteor.methods({
 
     let restriction = "all";
     if (
-      Meteor.settings
-      && Meteor.settings.users
-      && Meteor.settings.users.search
+      Meteor.settings &&
+      Meteor.settings.users &&
+      Meteor.settings.users.search
     ) {
       restriction = Meteor.settings.users.search;
     }
@@ -372,9 +375,9 @@ Meteor.methods({
 
     let restriction = "all";
     if (
-      Meteor.settings
-      && Meteor.settings.users
-      && Meteor.settings.users.invite
+      Meteor.settings &&
+      Meteor.settings.users &&
+      Meteor.settings.users.invite
     ) {
       restriction = Meteor.settings.users.invite;
     }
